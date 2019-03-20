@@ -9,41 +9,149 @@
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View} from 'react-native';
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
+'use strict';
 
-type Props = {};
-export default class App extends Component<Props> {
+var React = require('react-native');
+var Button = require('react-native-button');
+var {Component, AppRegistry, StyleSheet, Text, View, TextInput,} = React;
+
+class MonthlyCarLoan extends Component {
+  constructor() {
+    super();
+
+    this.state = {
+      CarPrice: 0,
+      DownPayment: 0,
+      LoanYear:0,
+      LoanMonth:0,
+      InterestRate:0,
+    };
+  }
+
+  containerTouched(e) {
+    this.refs.CarPrice.blur();
+    this.refs.DownPayment.blur();
+    this.refs.LoanYear.blur();
+    this.refs.InterestRate.blur();
+    return false;
+  }
+
+  calcMLP(e) {
+    var { CarPrice, DownPayment, LoanYear, LoanMonth, InterestRate } = this.state;
+    LoanMonth=LoanYear*12;
+
+    var MLP = ((InterestRate/12*DownPayment)/(1-(Math.pow((12/(InterestRate+12)),LoanMonth))
+    ).toFixed(2);
+    var result = `Your Loan Monthly Payment is = ${MLP}`;
+    this.setState({result});
+  }
+
   render() {
     return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get started, edit App.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
+      <View
+        style={styles.rootContainer}
+        onStartShouldSetResponder={this.containerTouched.bind(this)}
+      >
+        <Text style={styles.title}>
+          Monthly Car Loan
+        </Text>
+        <View style={styles.inputContainer}>
+          <Text style={styles.textLabel}>
+            Car Price:
+          </Text>
+          <TextInput
+            style={styles.textInput}
+            keyboardType="numeric"
+            onChangeText={(CarPrice) => this.setState({CarPrice})}
+            value={this.state.CarPrice}
+            ref="CarPrice"
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <Text style={styles.textLabel}>
+            Down Payment:
+          </Text>
+          <TextInput
+            style={styles.textInput}
+            keyboardType="numeric"
+            onChangeText={(DownPayment) => this.setState({DownPayment})}
+            value={this.state.DownPayment}
+            ref="DownPayment"
+          />
+        </View>
+        <View style={styles.inputContainer}>
+        <Text style={styles.textLabel}>
+          Loan Period (years):
+        </Text>
+        <TextInput
+          style={styles.textInput}
+          keyboardType="numeric"
+          onChangeText={(LoanYear) => this.setState({LoanYear})}
+          value={this.state.LoanYear}
+          ref="LoanYear"
+        />
+      </View>
+      <View style={styles.inputContainer}>
+          <Text style={styles.textLabel}>
+            InterestRate
+          </Text>
+          <TextInput
+            style={styles.textInput}
+            keyboardType="numeric"
+            onChangeText={(InterestRate) => this.setState({InterestRate})}
+            value={this.state.InterestRate}
+            ref="InterestRate"
+          />
+        </View>
+        <Button
+          style={styles.calcButton}
+          onPress={this.calcMLP.bind(this)}
+        >
+          Press me to calculate your Monthly Car Loan Payment
+        </Button>
+        <Text style={styles.textResult}>
+          {this.state.result}
+        </Text>
       </View>
     );
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
+var styles = StyleSheet.create({
+  rootContainer: {
     flex: 1,
-    justifyContent: 'center',
+    paddingTop: 40,
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
   },
-  welcome: {
+  inputContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingTop: 20,
+  },
+  title: {
+    fontSize: 30,
+    padding: 10,
+    textAlign: 'center',
+  },
+  textLabel: {
     fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
   },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
+  textResult: {
+    paddingTop: 20,
+    fontSize: 20,
+  },
+  calcButton: {
+    marginTop: 20,
+  },
+  textInput: {
+    marginLeft: 10,
+    padding: 5,
+    height: 30,
+    width: 180,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
   },
 });
+
+AppRegistry.registerComponent('MonthlyCarLoan', () => MonthlyCarLoan);
